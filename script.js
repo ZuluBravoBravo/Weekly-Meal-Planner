@@ -65,17 +65,31 @@ const volumeToTsp = { tsp:1, tbsp:3, cup:48, pint:96, quart:192 };
 const weightToOz = { oz:1, lb:16 };
 
 // -----------------------------
-// Convert decimal to mixed fraction
+// Convert decimal to simplified mixed fraction
 // -----------------------------
+function gcd(a, b) {
+  return b === 0 ? a : gcd(b, a % b);
+}
+
 function toMixedFraction(value) {
   const whole = Math.floor(value);
   const frac = value - whole;
-  const denominator = 16;
-  const numerator = Math.round(frac * denominator);
-  if (numerator === 0) return `${whole}`;
+
+  if (frac === 0) return `${whole}`; // no fractional part
+
+  // convert fraction to 16ths first
+  let denominator = 16;
+  let numerator = Math.round(frac * denominator);
+
+  // reduce fraction
+  const divisor = gcd(numerator, denominator);
+  numerator /= divisor;
+  denominator /= divisor;
+
   if (whole === 0) return `${numerator}/${denominator}`;
   return `${whole} ${numerator}/${denominator}`;
 }
+
 
 // -----------------------------
 // Generate Shopping List
