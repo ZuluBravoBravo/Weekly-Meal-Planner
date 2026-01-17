@@ -86,14 +86,15 @@ serve immediately.`
   },
 
   {
-    name: "Omelette",
+    name: "Left Overs",
     ingredients: [
-      { name: "egg", amount: 3, unit: "each", category: "Dairy" },
-      { name: "milk", amount: 0.25, unit: "cup", category: "Dairy" },
-      { name: "cheddar cheese", amount: 2, unit: "oz", category: "Dairy" },
-      { name: "salt", amount: 1, unit: "tsp", category: "Pantry" }
+      { name: "leftovers", amount: 0, unit: "each", category: "pantry" },
+
     ],
-    instructions: "Beat eggs and milk, heat pan, pour eggs, add cheese, fold and serve."
+    instructions: `PREP
+    Get out of fridge
+    microwave
+    eat
   },
 
   {
