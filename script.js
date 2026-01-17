@@ -13,6 +13,11 @@ const recipes = [
     instructions: "Mix all ingredients, heat a skillet over medium heat, pour batter, cook until golden on both sides."
   },
  
+
+
+
+
+
   
   {
     name: "Lentil Soup",
@@ -23,7 +28,7 @@ const recipes = [
       { name: "celery", amount: 0.5, unit: "cup" },
       { name: "kosher salt", amount: 2, unit: "tsp" },
       { name: "lentils", amount: 1, unit: "lb" },
-      { name: "tomatoes", amount: 1, unit: "cup" },
+      { name: "peeled and chopped tomatoes", amount: 1, unit: "can" },
       { name: "vegetable broth", amount: 2, unit: "quart" },
       { name: "ground coriander", amount: 0.5, unit: "tsp" },
       { name: "cumin", amount: 0.5, unit: "tsp" },
