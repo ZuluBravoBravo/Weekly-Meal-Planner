@@ -65,30 +65,44 @@ const volumeToTsp = { tsp:1, tbsp:3, cup:48, pint:96, quart:192 };
 const weightToOz = { oz:1, lb:16 };
 
 // -----------------------------
-// Convert decimal to simplified mixed fraction
+// Convert decimal to simple fraction (1/2, 1/3, 1/4, etc.)
 // -----------------------------
-function gcd(a, b) {
-  return b === 0 ? a : gcd(b, a % b);
-}
-
 function toMixedFraction(value) {
   const whole = Math.floor(value);
   const frac = value - whole;
 
-  if (frac === 0) return `${whole}`; // no fractional part
+  if (frac === 0) return `${whole}`;
 
-  // convert fraction to 16ths first
-  let denominator = 16;
-  let numerator = Math.round(frac * denominator);
+  // common denominators to support: 2, 3, 4, 6, 8, 12, 16
+  const denominators = [2, 3, 4, 6, 8, 12, 16];
+  let bestNumerator = 1;
+  let bestDenominator = 2;
+  let minError = Infinity;
+
+  for (let d of denominators) {
+    let n = Math.round(frac * d);
+    let error = Math.abs(frac - n / d);
+    if (error < minError && n > 0) {
+      minError = error;
+      bestNumerator = n;
+      bestDenominator = d;
+    }
+  }
 
   // reduce fraction
-  const divisor = gcd(numerator, denominator);
-  numerator /= divisor;
-  denominator /= divisor;
+  const divisor = gcd(bestNumerator, bestDenominator);
+  const numerator = bestNumerator / divisor;
+  const denominator = bestDenominator / divisor;
 
   if (whole === 0) return `${numerator}/${denominator}`;
   return `${whole} ${numerator}/${denominator}`;
 }
+
+// greatest common divisor helper
+function gcd(a, b) {
+  return b === 0 ? a : gcd(b, a % b);
+}
+
 
 
 // -----------------------------
