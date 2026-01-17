@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weekly Meal Planner</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1, h2 {
+      text-align: center;
+    }
+    .day-selector {
+      margin-bottom: 15px;
+    }
+    label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    select {
+      padding: 5px;
+    }
+    #generate-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    #output {
+      margin-top: 40px;
+    }
+    .shopping-list, .recipe {
+      margin-bottom: 40px;
+    }
+    .recipe {
+      page-break-before: always;
+    }
+    ul {
+      list-style-type: disc;
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Weekly Meal Planner</h1>
+
+  <div id="selectors">
+    <div class="day-selector">
+      <label for="monday">Monday:</label>
+      <select id="monday"></select>
+    </div>
+    <div class="day-selector">
+      <label for="tuesday">Tuesday:</label>
+      <select id="tuesday"></select>
+    </div>
+    <div class="day-selector">
+      <label for="wednesday">Wednesday:</label>
+      <select id="wednesday"></select>
+    </div>
+    <div class="day-selector">
+      <label for="thursday">Thursday:</label>
+      <select id="thursday"></select>
+    </div>
+    <div class="day-selector">
+      <label for="friday">Friday:</label>
+      <select id="friday"></select>
+    </div>
+    <div class="day-selector">
+      <label for="saturday">Saturday:</label>
+      <select id="saturday"></select>
+    </div>
+    <div class="day-selector">
+      <label for="sunday">Sunday:</label>
+      <select id="sunday"></select>
+    </div>
+  </div>
+
+  <button id="generate-btn">Generate Recipes & Shopping List</button>
+
+  <div id="output">
+    <div class="shopping-list" id="shopping-list"></div>
+    <div class="recipes" id="recipes"></div>
+  </div>
+
+  <script>
+    // Populate dropdowns with recipe names
+    const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+    days.forEach(day => {
+      const select = document.getElementById(day);
+      recipes.forEach(r => {
+        const option = document.createElement("option");
+        option.value = r.name;
+        option.textContent = r.name;
+        select.appendChild(option);
+      });
+    });
+
+    // Generate button click
+    document.getElementById("generate-btn").addEventListener("click", () => {
+      // Gather selected recipes
+      const selectedRecipes = [];
+      days.forEach(day => {
+        const select = document.getElementById(day);
+        const recipe = recipes.find(r => r.name === select.value);
+        if(recipe) selectedRecipes.push(recipe);
+      });
+
+      // Generate shopping list
+      const shopping = generateShoppingList(selectedRecipes);
+      const shoppingDiv = document.getElementById("shopping-list");
+      shoppingDiv.innerHTML = "<h2>Shopping List</h2><ul>" + shopping.map(i => `<li>${i}</li>`).join("") + "</ul>";
+
+      // Generate recipes section
+      const recipesDiv = document.getElementById("recipes");
+      recipesDiv.innerHTML = "<h2>Recipes</h2>";
+      selectedRecipes.forEach(r => {
+        const div = document.createElement("div");
+        div.className = "recipe";
+        let html = `<h3>${r.name}</h3>`;
+        html += "<h4>Ingredients:</h4><ul>";
+        r.ingredients.forEach(ing => {
+          html += `<li>${ing.amount} ${ing.unit} ${ing.name}</li>`;
+        });
+        html += "</ul>";
+        if(r.instructions) html += `<h4>Instructions:</h4><p>${r.instructions}</p>`;
+        div.innerHTML = html;
+        recipesDiv.appendChild(div);
+      });
+    });
+  </script>
+</body>
+</html>
