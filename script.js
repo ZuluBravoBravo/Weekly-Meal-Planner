@@ -38,28 +38,17 @@ const recipes = [
 // -----------------------------
 // Unit Conversion Tables
 // -----------------------------
-const volumeToTsp = {
-  tsp: 1,
-  tbsp: 3,
-  cup: 48,
-  pint: 96,
-  quart: 192
-};
-
-const weightToOz = {
-  oz: 1,
-  lb: 16
-};
+const volumeToTsp = { tsp:1, tbsp:3, cup:48, pint:96, quart:192 };
+const weightToOz = { oz:1, lb:16 };
 
 // -----------------------------
-// Helper: Convert Decimal to Mixed Fraction
+// Convert decimal to mixed fraction
 // -----------------------------
 function toMixedFraction(value) {
   const whole = Math.floor(value);
   const frac = value - whole;
   const denominator = 16;
   const numerator = Math.round(frac * denominator);
-
   if (numerator === 0) return `${whole}`;
   if (whole === 0) return `${numerator}/${denominator}`;
   return `${whole} ${numerator}/${denominator}`;
@@ -85,47 +74,38 @@ function generateShoppingList(selectedRecipes) {
         unit = "oz";
       }
 
-      if (!totals[key]) {
-        totals[key] = { amount: 0, unit };
-      }
-
+      if (!totals[key]) totals[key] = { amount:0, unit };
       totals[key].amount += amount;
     });
   });
 
   const shoppingList = [];
-
   for (let ing in totals) {
-    let { amount, unit } = totals[ing];
+    let {amount, unit} = totals[ing];
 
-    if (unit === "tsp") {
-      const cups = Math.floor(amount / volumeToTsp.cup);
-      amount -= cups * volumeToTsp.cup;
-      const tbsp = Math.floor(amount / volumeToTsp.tbsp);
-      amount -= tbsp * volumeToTsp.tbsp;
+    if (unit==="tsp") {
+      const cups = Math.floor(amount/volumeToTsp.cup);
+      amount -= cups*volumeToTsp.cup;
+      const tbsp = Math.floor(amount/volumeToTsp.tbsp);
+      amount -= tbsp*volumeToTsp.tbsp;
       const tsp = amount;
-
       const parts = [];
-      if (cups) parts.push(`${cups} cup`);
-      if (tbsp) parts.push(`${tbsp} tbsp`);
-      if (tsp) parts.push(`${toMixedFraction(tsp)} tsp`);
-
+      if(cups) parts.push(`${cups} cup`);
+      if(tbsp) parts.push(`${tbsp} tbsp`);
+      if(tsp) parts.push(`${toMixedFraction(tsp)} tsp`);
       shoppingList.push(`${ing}: ${parts.join(" + ")}`);
-    } else if (unit === "oz") {
-      const lbs = Math.floor(amount / weightToOz.lb);
-      amount -= lbs * weightToOz.lb;
+    } else if(unit==="oz") {
+      const lbs = Math.floor(amount/weightToOz.lb);
+      amount -= lbs*weightToOz.lb;
       const oz = amount;
-
       const parts = [];
-      if (lbs) parts.push(`${lbs} lb`);
-      if (oz) parts.push(`${toMixedFraction(oz)} oz`);
-
+      if(lbs) parts.push(`${lbs} lb`);
+      if(oz) parts.push(`${toMixedFraction(oz)} oz`);
       shoppingList.push(`${ing}: ${parts.join(" + ")}`);
     } else {
       shoppingList.push(`${ing}: ${toMixedFraction(amount)} ${unit}`);
     }
   }
-
   return shoppingList;
 }
 
@@ -138,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Populate dropdowns
   days.forEach(day => {
     const select = document.getElementById(day);
-    recipes.forEach(r => {
+    recipes.forEach(r=>{
       const option = document.createElement("option");
       option.value = r.name;
       option.textContent = r.name;
@@ -146,43 +126,38 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Generate button
+  // Generate
   document.getElementById("generate-btn").addEventListener("click", () => {
     const selectedRecipes = [];
-
-    days.forEach(day => {
+    days.forEach(day=>{
       const select = document.getElementById(day);
-      const recipe = recipes.find(r => r.name === select.value);
-      if (recipe) selectedRecipes.push(recipe);
+      const recipe = recipes.find(r=>r.name===select.value);
+      if(recipe) selectedRecipes.push(recipe);
     });
 
     // Shopping list
     const shopping = generateShoppingList(selectedRecipes);
     const shoppingDiv = document.getElementById("shopping-list");
-    shoppingDiv.innerHTML =
-      "<h2>Shopping List</h2><ul>" +
-      shopping.map(i => `<li>${i}</li>`).join("") +
-      "</ul>";
+    shoppingDiv.innerHTML = "<h2>Shopping List</h2><ul>"+shopping.map(i=>`<li>${i}</li>`).join("")+"</ul>";
 
     // Recipes
     const recipesDiv = document.getElementById("recipes");
     recipesDiv.innerHTML = "<h2>Recipes</h2>";
 
-    selectedRecipes.forEach(r => {
+    selectedRecipes.forEach(r=>{
       const div = document.createElement("div");
-      div.className = "recipe";
-
+      div.className="recipe";
       let html = `<h3>${r.name}</h3>`;
 
-      html += "<h4>Ingredients</h4><ul>";
-      r.ingredients.forEach(ing => {
-        html += `<li>${toMixedFraction(ing.amount)} ${ing.unit} ${ing.name}</li>`;
+      html+="<h4>Ingredients</h4><ul>";
+      r.ingredients.forEach(ing=>{
+        html+=`<li>${toMixedFraction(ing.amount)} ${ing.unit} ${ing.name}</li>`;
       });
-      html += "</ul>";
+      html+="</ul>";
 
-      html += "<h4>Instructions</h4>";
-      r.instructions.split(",").forEach(step => {
-        html += `<p>${step.trim()}</p>`;
+      html+="<h4>Instructions</h4>";
+      r.instructions.split(",").forEach(step=>{
+        html+=`<p>${step.trim()}</p>`;
       });
 
       div.innerHTML = html;
@@ -190,8 +165,6 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Print button
-  document.getElementById("print-btn").addEventListener("click", () => {
-    window.print();
-  });
+  // Print
+  document.getElementById("print-btn").addEventListener("click",()=>window.print());
 });
