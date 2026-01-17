@@ -31,7 +31,7 @@ Cook until golden on both sides`
       { name: "olive oil", amount: 2, unit: "tbsp" },
       { name: "onion", amount: 1, unit: "cup" },
       { name: "carrots", amount: 0.5, unit: "cup" },
-      { name: "celery", amount: 0.5, unit: "cup" },
+      { name: "celery", amount: 1, unit: "stalk" },
       { name: "kosher salt", amount: 2, unit: "tsp" },
       { name: "lentils", amount: 1, unit: "lb" },
       { name: "peeled and chopped tomatoes", amount: 1, unit: "can" },
@@ -40,20 +40,25 @@ Cook until golden on both sides`
       { name: "cumin", amount: 0.5, unit: "tsp" },
       { name: "grains of paradise", amount: 0.5, unit: "tsp" }
     ],
-    instructions: `Get out a 6 quart dutch oven
-      finely chop the onion
-  finely chop the carrot
+    instructions: `Prep
+    Get out a 6 quart dutch oven
+    finely chop the onion
+    finely chop 1/2 a cup of carrots
     finely chop the celery
-      peel and chop the tomatoes
-        place the olive oil into a large 6 quart dutch oven
-          sit over medium heat
-            once hot add the finely chopped onion
-              finely chopped carrot
-                finely chopped celery
-                  salt
-                    sweat for 6 to 7 minutes until the onions are translucent
-                      add the lentils, tomatoes, broth, coriander, cumin, grains of paradise, stir to combine, increase the heat to high, bring just to a boil, reduce the heat to low, cover and simmer for 35 to 40 minutes until the lentils are tender
-              serve immediately.`
+    open the can of tomatoes
+    
+    place the olive oil into a large 6 quart dutch oven
+    sit over medium heat
+    once hot add the finely chopped onion, carrot, and celery
+    add salt
+    
+    sweat for 6 to 7 minutes until the onions are translucent
+    
+    add the lentils, tomatoes, broth, coriander, cumin, grains of paradise and stir to combine
+    increase the heat to high and bring just to a boil
+    
+    cover, reduce the heat to low, and simmer for 35 to 40 minutes until the lentils are tender
+    serve immediately.`
   },
 
   
