@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Weekly Meal Planner</title>
-  <link rel="stylesheet" href="style.css">
   <script src="script.js" defer></script>
   <style>
     body {
@@ -152,69 +151,5 @@
     <div class="shopping-list" id="shopping-list"></div>
     <div class="recipes" id="recipes"></div>
   </div>
-
-  <script>
-    // Populate dropdowns
-    const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
-    days.forEach(day => {
-      const select = document.getElementById(day);
-      recipes.forEach(r => {
-        const option = document.createElement("option");
-        option.value = r.name;
-        option.textContent = r.name;
-        select.appendChild(option);
-      });
-    });
-
-    // Generate button
-    document.getElementById("generate-btn").addEventListener("click", () => {
-      const selectedRecipes = [];
-      days.forEach(day => {
-        const select = document.getElementById(day);
-        const recipe = recipes.find(r => r.name === select.value);
-        if (recipe) selectedRecipes.push(recipe);
-      });
-
-      /* ---------- SHOPPING LIST ---------- */
-      const shopping = generateShoppingList(selectedRecipes);
-      const shoppingDiv = document.getElementById("shopping-list");
-      shoppingDiv.innerHTML =
-        "<h2>Shopping List</h2><ul>" +
-        shopping.map(i => `<li>${i}</li>`).join("") +
-        "</ul>";
-
-      /* ---------- RECIPES ---------- */
-      const recipesDiv = document.getElementById("recipes");
-      recipesDiv.innerHTML = "<h2>Recipes</h2>";
-
-      selectedRecipes.forEach(r => {
-        const div = document.createElement("div");
-        div.className = "recipe";
-
-        let html = `<h3>${r.name}</h3>`;
-
-        html += "<h4>Ingredients</h4><ul>";
-        r.ingredients.forEach(ing => {
-          html += `<li>${toMixedFraction(ing.amount)} ${ing.unit} ${ing.name}</li>`;
-        });
-        html += "</ul>";
-
-        if (r.instructions) {
-          html += "<h4>Instructions</h4>";
-          r.instructions.split(",").forEach(step => {
-            html += `<p>${step.trim()}</p>`;
-          });
-        }
-
-        div.innerHTML = html;
-        recipesDiv.appendChild(div);
-      });
-    });
-
-    // Print button
-    document.getElementById("print-btn").addEventListener("click", () => {
-      window.print();
-    });
-  </script>
 </body>
 </html>
