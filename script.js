@@ -22,11 +22,14 @@ const recipes = [
       { name: "pepper", amount: 1, unit: "pinch" }  
     ],
  instructions: `PREP
+ get out a large stock pot
  cut half an onion into 1/2 inch pieces
  slice celery crossways into 1/2 inch pieces
  cut half a bulb of fennel into 1 inch pieces
  peel and cut potatos into 1 inch cubes
+ thinly slice the swiss chard
  finely chop garlic
+ Open cannelli beans
  
  Heat oil in a large stock pot over medium high heat
  add onion celery fennel potatoes and garlic
@@ -64,7 +67,8 @@ const recipes = [
       { name: "cumin", amount: 0.5, unit: "tsp" },
       { name: "grains of paradise", amount: 0.5, unit: "tsp" }
     ],
-    instructions: `Get out a 6 quart dutch oven
+    instructions: `PREP
+    Get out a 6 quart dutch oven
     finely chop 1/2 a cup of onion
     finely chop 1/2 a cup of carrot
     finely chop 1/2 a cup of celery
