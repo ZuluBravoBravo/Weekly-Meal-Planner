@@ -10,7 +10,8 @@ const recipes = [
       { name: "egg", amount: 2, unit: "each" },
       { name: "sugar", amount: 2, unit: "tbsp" }
     ],
-    instructions: "Mix all ingredients, heat a skillet over medium heat, pour batter, cook until golden on both sides."
+    instructions: "Mix all ingredients, heat a skillet over medium heat, 
+      pour batter, cook until golden on both sides."
   },
  
 
