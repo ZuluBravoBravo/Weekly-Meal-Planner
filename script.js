@@ -40,8 +40,7 @@ Cook until golden on both sides`
       { name: "cumin", amount: 0.5, unit: "tsp" },
       { name: "grains of paradise", amount: 0.5, unit: "tsp" }
     ],
-    instructions:
-      'Get out a 6 quart dutch oven
+    instructions: 'Get out a 6 quart dutch oven
       finely chop the onion
   finely chop the carrot
     finely chop the celery
