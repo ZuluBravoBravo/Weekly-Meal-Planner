@@ -2,24 +2,24 @@
 // Sample Recipes
 // -----------------------------
 const recipes = [
-
   {
     name: "Lentil Soup",
     ingredients: [
       { name: "olive oil", amount: 2, unit: "tbsp" },
-      { name: "onion", amount: 1, unit: "cup" },      
+      { name: "onion", amount: 1, unit: "cup" },
       { name: "carrots", amount: 0.5, unit: "cup" },
       { name: "celery", amount: 0.5, unit: "cup" },
-      { name: "kosher salt", amount: 2, unit: "tsp" }
+      { name: "kosher salt", amount: 2, unit: "tsp" },
       { name: "lentils", amount: 1, unit: "lb" },
-      { name: "tomatos", amount: 1, unit: "cup" },      
+      { name: "tomatoes", amount: 1, unit: "cup" },
       { name: "vegetable broth", amount: 2, unit: "quart" },
       { name: "ground coriander", amount: 0.5, unit: "tsp" },
       { name: "cumin", amount: 0.5, unit: "tsp" },
-      { name: "grains of paradise", amount: 0.5, unit: "tsp" },    
+      { name: "grains of paradise", amount: 0.5, unit: "tsp" }
     ],
-    instructions: "Get out a 6 quart dutch oven, finely chop the onion, finely chop the carrot, finely chop the celery peel and chop the tomatoes, ,place the olive oil into a large 6 quart dutch oven, sit over medium heat, once hot add the finely chopped onion,  finely chopped carrot, finely chopped celery, salt, Sweat for 6 to 7 minutes until the onions are translucent, add the lentils, tomatoes, broth, coriander, cumin, grains of paradise, stir to combine, ,Increase the heat to high, bring just to a boil, ,Reduce the heat to low, cover and simmer for 35 to 40 minutes until the lentils are tender, ,Serve immediately."
-  },  
+    instructions:
+      "Get out a 6 quart dutch oven, finely chop the onion, finely chop the carrot, finely chop the celery, peel and chop the tomatoes, place the olive oil into a large 6 quart dutch oven, sit over medium heat, once hot add the finely chopped onion, finely chopped carrot, finely chopped celery, salt, sweat for 6 to 7 minutes until the onions are translucent, add the lentils, tomatoes, broth, coriander, cumin, grains of paradise, stir to combine, increase the heat to high, bring just to a boil, reduce the heat to low, cover and simmer for 35 to 40 minutes until the lentils are tender, serve immediately."
+  },
   {
     name: "Pancakes",
     ingredients: [
@@ -28,7 +28,8 @@ const recipes = [
       { name: "egg", amount: 2, unit: "each" },
       { name: "sugar", amount: 2, unit: "tbsp" }
     ],
-    instructions: "Mix all ingredients, heat a skillet over medium heat, pour batter, cook until golden on both sides."
+    instructions:
+      "Mix all ingredients, heat a skillet over medium heat, pour batter, cook until golden on both sides."
   },
   {
     name: "Omelette",
@@ -38,7 +39,8 @@ const recipes = [
       { name: "cheddar cheese", amount: 2, unit: "oz" },
       { name: "salt", amount: 1, unit: "tsp" }
     ],
-    instructions: "Beat eggs and milk, heat pan, pour eggs, add cheese, fold and serve."
+    instructions:
+      "Beat eggs and milk, heat pan, pour eggs, add cheese, fold and serve."
   },
   {
     name: "Chocolate Chip Cookies",
@@ -49,7 +51,8 @@ const recipes = [
       { name: "chocolate chips", amount: 1, unit: "cup" },
       { name: "egg", amount: 1, unit: "each" }
     ],
-    instructions: "Cream butter and sugar, add egg, mix in dry ingredients, fold in chips, bake until golden."
+    instructions:
+      "Cream butter and sugar, add egg, mix in dry ingredients, fold in chips, bake until golden."
   }
 ];
 
@@ -107,109 +110,4 @@ function generateShoppingList(selectedRecipes) {
         totals[key] = { amount: 0, unit };
       }
 
-      totals[key].amount += amount;
-    });
-  });
-
-  const shoppingList = [];
-
-  for (let ing in totals) {
-    let { amount, unit } = totals[ing];
-
-    if (unit === "tsp") {
-      const cups = Math.floor(amount / volumeToTsp.cup);
-      amount -= cups * volumeToTsp.cup;
-      const tbsp = Math.floor(amount / volumeToTsp.tbsp);
-      amount -= tbsp * volumeToTsp.tbsp;
-      const tsp = amount;
-
-      const parts = [];
-      if (cups) parts.push(`${cups} cup`);
-      if (tbsp) parts.push(`${tbsp} tbsp`);
-      if (tsp) parts.push(`${toMixedFraction(tsp)} tsp`);
-
-      shoppingList.push(`${ing}: ${parts.join(" + ")}`);
-    } else if (unit === "oz") {
-      const lbs = Math.floor(amount / weightToOz.lb);
-      amount -= lbs * weightToOz.lb;
-      const oz = amount;
-
-      const parts = [];
-      if (lbs) parts.push(`${lbs} lb`);
-      if (oz) parts.push(`${toMixedFraction(oz)} oz`);
-
-      shoppingList.push(`${ing}: ${parts.join(" + ")}`);
-    } else {
-      shoppingList.push(`${ing}: ${toMixedFraction(amount)} ${unit}`);
-    }
-  }
-
-  return shoppingList;
-}
-
-// -----------------------------
-// UI Logic
-// -----------------------------
-document.addEventListener("DOMContentLoaded", () => {
-  const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
-
-  // Populate dropdowns
-  days.forEach(day => {
-    const select = document.getElementById(day);
-    recipes.forEach(r => {
-      const option = document.createElement("option");
-      option.value = r.name;
-      option.textContent = r.name;
-      select.appendChild(option);
-    });
-  });
-
-  // Generate button
-  document.getElementById("generate-btn").addEventListener("click", () => {
-    const selectedRecipes = [];
-
-    days.forEach(day => {
-      const select = document.getElementById(day);
-      const recipe = recipes.find(r => r.name === select.value);
-      if (recipe) selectedRecipes.push(recipe);
-    });
-
-    // Shopping list
-    const shopping = generateShoppingList(selectedRecipes);
-    const shoppingDiv = document.getElementById("shopping-list");
-    shoppingDiv.innerHTML =
-      "<h2>Shopping List</h2><ul>" +
-      shopping.map(i => `<li>${i}</li>`).join("") +
-      "</ul>";
-
-    // Recipes
-    const recipesDiv = document.getElementById("recipes");
-    recipesDiv.innerHTML = "<h2>Recipes</h2>";
-
-    selectedRecipes.forEach(r => {
-      const div = document.createElement("div");
-      div.className = "recipe";
-
-      let html = `<h3>${r.name}</h3>`;
-
-      html += "<h4>Ingredients</h4><ul>";
-      r.ingredients.forEach(ing => {
-        html += `<li>${toMixedFraction(ing.amount)} ${ing.unit} ${ing.name}</li>`;
-      });
-      html += "</ul>";
-
-      html += "<h4>Instructions</h4>";
-      r.instructions.split(",").forEach(step => {
-        html += `<p>${step.trim()}</p>`;
-      });
-
-      div.innerHTML = html;
-      recipesDiv.appendChild(div);
-    });
-  });
-
-  // Print button
-  document.getElementById("print-btn").addEventListener("click", () => {
-    window.print();
-  });
-});
+      totals[key].amount
