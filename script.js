@@ -16,7 +16,8 @@ const recipes = [
       { name: "egg", amount: 2, unit: "each" },
       { name: "sugar", amount: 2, unit: "tbsp" }
     ],
- instructions: `cut half an onion into 1/2" pieces
+ instructions: `PREP
+ cut half an onion into 1/2" pieces
  slice celery crossways into 1/2" pieces
  cut half a bulb of fennel into 1" pieces
  peel and cut potatos into 1" cubes
