@@ -1,5 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Planner</title>
+
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  h1, h2, h3 { text-align: center; }
+
+  .day-selector, #standalone-section, #generate-btn, #print-btn {
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  label { font-weight: bold; margin-right: 10px; }
+  select { padding: 5px; }
+
+  #generate-btn, #print-btn {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    margin: 10px auto;
+    display: block;
+  }
+
+  #output { margin-top: 40px; }
+
+  .shopping-list, .recipe {
+    margin-bottom: 40px;
+  }
+
+  .print-page {
+    page-break-before: always;
+  }
+
+  ul { list-style-type: disc; margin-left: 20px; }
+
+  /* ---------- PRINT RULES ---------- */
+  @media print {
+    body * {
+      visibility: hidden;
+    }
+
+    #output, #output * {
+      visibility: visible;
+    }
+
+    #output {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+    }
+
+    #print-btn {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h1>Weekly Meal Planner</h1>
+
+<div id="selectors">
+  <div class="day-selector"><label>Monday:</label><select id="monday"></select></div>
+  <div class="day-selector"><label>Tuesday:</label><select id="tuesday"></select></div>
+  <div class="day-selector"><label>Wednesday:</label><select id="wednesday"></select></div>
+  <div class="day-selector"><label>Thursday:</label><select id="thursday"></select></div>
+  <div class="day-selector"><label>Friday:</label><select id="friday"></select></div>
+  <div class="day-selector"><label>Saturday:</label><select id="saturday"></select></div>
+  <div class="day-selector"><label>Sunday:</label><select id="sunday"></select></div>
+</div>
+
+<hr>
+
+<div id="standalone-section">
+  <h3>Add Individual Items</h3>
+  <div id="standalone-checkboxes"></div>
+</div>
+
+<button id="generate-btn">Generate Recipes & Shopping List</button>
+<button id="print-btn" onclick="window.print()">Print / Save PDF</button>
+
+<div id="output">
+  <div id="shopping-list" class="shopping-list"></div>
+  <div id="recipes"></div>
+</div>
+
+<script>
 // -----------------------------
-// Sample Recipes
+// Recipes
 // -----------------------------
 const recipes = [
   {
@@ -43,7 +135,6 @@ prepare the pasta to Al Dente by following the directions included with the past
 divide pasta evenly between bowls
 little soup over the pasta and garnish with cheese`
   },
-
   {
     name: "Lentil Soup",
     ingredients: [
@@ -84,203 +175,182 @@ cover, reduce the heat to low, simmer for 35 to 40 minutes
 until the lentils are tender
 serve immediately.`
   },
-
   {
     name: "Left Overs",
     ingredients: [
-      { name: "leftovers", amount: 0, unit: "each", category: "pantry" },
-
+      { name: "leftovers", amount: 0, unit: "each", category: "Pantry" }
     ],
     instructions: `PREP
-    Get out of fridge
-    microwave
-    eat`
-  },
-
-  {
-    name: "Chocolate Chip Cookies",
-    ingredients: [
-      { name: "all-purpose flour", amount: 2, unit: "cup", category: "Grains" },
-      { name: "brown sugar", amount: 1, unit: "cup", category: "Pantry" },
-      { name: "butter", amount: 0.5, unit: "lb", category: "Dairy" },
-      { name: "chocolate chips", amount: 1, unit: "cup", category: "Pantry" },
-      { name: "egg", amount: 1, unit: "each", category: "Dairy" }
-    ],
-    instructions: "Cream butter and sugar, add egg, mix in dry ingredients, fold in chips, bake until golden."
+Get out of fridge
+microwave
+eat`
   }
 ];
 
 // -----------------------------
-// Unit Conversion Tables
+// Standalone checkbox items
+// -----------------------------
+const standaloneItems = [
+  { name: "milk", amount: 1, unit: "cup", category: "Dairy" },
+  { name: "butter", amount: 1, unit: "lb", category: "Dairy" },
+  { name: "chicken breast", amount: 1, unit: "lb", category: "Meat" },
+  { name: "eggs", amount: 12, unit: "each", category: "Dairy" },
+  { name: "bread", amount: 1, unit: "loaf", category: "Bakery" },
+  { name: "cereal", amount: 1, unit: "box", category: "Pantry" }
+];
+
+// -----------------------------
+// Unit conversion
 // -----------------------------
 const volumeToTsp = { tsp:1, tbsp:3, cup:48, pint:96, quart:192 };
 const weightToOz = { oz:1, lb:16 };
 
 // -----------------------------
-// Convert decimal to simple fraction (1/2, 1/3, 1/4, etc.)
+// Fraction helpers
 // -----------------------------
-function toMixedFraction(value) {
-  const whole = Math.floor(value);
-  const frac = value - whole;
-
-  if (frac === 0) return `${whole}`;
-
-  const denominators = [2,3,4,6,8,12,16];
-  let bestNumerator = 1, bestDenominator = 2, minError = Infinity;
-
-  for (let d of denominators) {
-    let n = Math.round(frac * d);
-    let error = Math.abs(frac - n/d);
-    if (error < minError && n > 0) {
-      minError = error;
-      bestNumerator = n;
-      bestDenominator = d;
-    }
+function gcd(a,b){return b===0?a:gcd(b,a%b);}
+function toMixedFraction(value){
+  const whole=Math.floor(value),frac=value-whole;
+  if(frac===0) return `${whole}`;
+  const denominators=[2,3,4,6,8,12,16];
+  let bestNumerator=1,bestDenominator=2,minError=Infinity;
+  for(let d of denominators){
+    let n=Math.round(frac*d),error=Math.abs(frac-n/d);
+    if(error<minError && n>0){bestNumerator=n;bestDenominator=d;minError=error;}
   }
-
-  // reduce fraction
-  const divisor = gcd(bestNumerator, bestDenominator);
-  const numerator = bestNumerator / divisor;
-  const denominator = bestDenominator / divisor;
-
-  if (whole === 0) return `${numerator}/${denominator}`;
+  const divisor=gcd(bestNumerator,bestDenominator);
+  const numerator=bestNumerator/divisor;
+  const denominator=bestDenominator/divisor;
+  if(whole===0) return `${numerator}/${denominator}`;
   return `${whole} ${numerator}/${denominator}`;
 }
 
-function gcd(a,b){return b===0?a:gcd(b,a%b);}
-
 // -----------------------------
-// Generate Shopping List
+// Shopping list builder
 // -----------------------------
-function generateShoppingList(selectedRecipes) {
-  const totals = {};
+function generateShoppingList(allIngredients){
+  const totals={};
 
-  selectedRecipes.forEach(recipe=>{
-    recipe.ingredients.forEach(ing=>{
-      const key = ing.name;
-      let amount = ing.amount;
-      let unit = ing.unit;
-      const category = ing.category || "Other";
-
-      if (volumeToTsp[unit]) { amount *= volumeToTsp[unit]; unit="tsp"; }
-      else if (weightToOz[unit]) { amount *= weightToOz[unit]; unit="oz"; }
-
-      if (!totals[key]) totals[key] = { amount:0, unit, category };
-      totals[key].amount += amount;
-    });
+  allIngredients.forEach(ing=>{
+    let amount=ing.amount,unit=ing.unit;
+    if(volumeToTsp[unit]){amount*=volumeToTsp[unit];unit="tsp";}
+    else if(weightToOz[unit]){amount*=weightToOz[unit];unit="oz";}
+    if(!totals[ing.name]) totals[ing.name]={amount:0,unit,category:ing.category||"Other"};
+    totals[ing.name].amount+=amount;
   });
 
-  // Convert totals to readable units
-  const shoppingItems = [];
-  for (let ing in totals) {
-    let {amount, unit, category} = totals[ing];
-
-    let displayAmount = "";
-    if(unit==="tsp") {
-      const cups = Math.floor(amount/volumeToTsp.cup);
-      amount -= cups*volumeToTsp.cup;
-      const tbsp = Math.floor(amount/volumeToTsp.tbsp);
-      amount -= tbsp*volumeToTsp.tbsp;
-      const tsp = amount;
-      const parts=[];
-      if(cups) parts.push(`${cups} cup`);
-      if(tbsp) parts.push(`${tbsp} tbsp`);
-      if(tsp) parts.push(`${toMixedFraction(tsp)} tsp`);
-      displayAmount = parts.join(" + ");
-    } else if(unit==="oz") {
-      const lbs = Math.floor(amount/weightToOz.lb);
-      amount -= lbs*weightToOz.lb;
-      const oz = amount;
-      const parts=[];
-      if(lbs) parts.push(`${lbs} lb`);
-      if(oz) parts.push(`${toMixedFraction(oz)} oz`);
-      displayAmount = parts.join(" + ");
-    } else {
-      displayAmount = `${toMixedFraction(amount)} ${unit}`;
-    }
-
-    shoppingItems.push({ name: ing, amount: displayAmount, category });
+  const categories={};
+  for(let name in totals){
+    const {amount,unit,category}=totals[name];
+    if(!categories[category]) categories[category]=[];
+    categories[category].push({name,amount,unit});
   }
 
-  // sort alphabetically within category
-  shoppingItems.sort((a,b)=>{
-    if(a.category < b.category) return -1;
-    if(a.category > b.category) return 1;
-    if(a.name < b.name) return -1;
-    if(a.name > b.name) return 1;
-    return 0;
+  const html=[];
+  Object.keys(categories).sort().forEach(cat=>{
+    html.push(`<h3>${cat}</h3><ul>`);
+    categories[cat]
+      .sort((a,b)=>a.name.localeCompare(b.name))
+      .forEach(i=>{
+        if(i.unit==="tsp"){
+          let cups=Math.floor(i.amount/volumeToTsp.cup);i.amount-=cups*volumeToTsp.cup;
+          let tbsp=Math.floor(i.amount/volumeToTsp.tbsp);i.amount-=tbsp*volumeToTsp.tbsp;
+          let tsp=i.amount;
+          let parts=[];
+          if(cups) parts.push(`${cups} cup`);
+          if(tbsp) parts.push(`${tbsp} tbsp`);
+          if(tsp) parts.push(`${toMixedFraction(tsp)} tsp`);
+          html.push(`<li>${i.name}: ${parts.join(" + ")}</li>`);
+        } else if(i.unit==="oz"){
+          let lbs=Math.floor(i.amount/weightToOz.lb);i.amount-=lbs*weightToOz.lb;
+          let oz=i.amount;
+          let parts=[];
+          if(lbs) parts.push(`${lbs} lb`);
+          if(oz) parts.push(`${toMixedFraction(oz)} oz`);
+          html.push(`<li>${i.name}: ${parts.join(" + ")}</li>`);
+        } else {
+          html.push(`<li>${i.name}: ${toMixedFraction(i.amount)} ${i.unit}</li>`);
+        }
+      });
+    html.push(`</ul>`);
   });
 
-  return shoppingItems;
+  return html.join("");
 }
 
 // -----------------------------
-// UI Logic
+// UI Setup
 // -----------------------------
 document.addEventListener("DOMContentLoaded",()=>{
-  const days = ["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
+  const days=["monday","tuesday","wednesday","thursday","friday","saturday","sunday"];
 
-  // Populate dropdowns
+  // Populate recipe dropdowns
   days.forEach(day=>{
-    const select = document.getElementById(day);
+    const select=document.getElementById(day);
     recipes.forEach(r=>{
-      const option = document.createElement("option");
+      const option=document.createElement("option");
       option.value=r.name;
       option.textContent=r.name;
       select.appendChild(option);
     });
   });
 
+  // Populate standalone checkboxes
+  const boxContainer=document.getElementById("standalone-checkboxes");
+  standaloneItems.forEach((item,i)=>{
+    const label=document.createElement("label");
+    label.style.display="block";
+    const cb=document.createElement("input");
+    cb.type="checkbox";
+    cb.value=i;
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(` ${item.name} (${item.unit})`));
+    boxContainer.appendChild(label);
+  });
+
   // Generate button
   document.getElementById("generate-btn").addEventListener("click",()=>{
-    const selectedRecipes = [];
+    const selectedRecipes=[];
     days.forEach(day=>{
-      const select = document.getElementById(day);
-      const recipe = recipes.find(r=>r.name===select.value);
+      const recipe=recipes.find(r=>r.name===document.getElementById(day).value);
       if(recipe) selectedRecipes.push(recipe);
     });
 
-    // Shopping list
-    const shoppingItems = generateShoppingList(selectedRecipes);
-    const categories = {};
-    shoppingItems.forEach(item=>{
-      if(!categories[item.category]) categories[item.category]=[];
-      categories[item.category].push(item);
-    });
+    // Checked standalone items
+    const checkedStandalone=Array.from(
+      document.querySelectorAll("#standalone-checkboxes input:checked")
+    ).map(cb=>standaloneItems[cb.value]);
 
-    const shoppingDiv = document.getElementById("shopping-list");
-    let html="<h2>Shopping List</h2>";
-    ["Produce","Meat","Dairy","Grains","Pantry","Other"].forEach(cat=>{
-      if(categories[cat]){
-        html+=`<h3>${cat}</h3><ul>`;
-        categories[cat].forEach(i=>html+=`<li>${i.name}: ${i.amount}</li>`);
-        html+="</ul>";
-      }
-    });
-    shoppingDiv.innerHTML=html;
+    const allIngredients=[
+      ...selectedRecipes.flatMap(r=>r.ingredients),
+      ...checkedStandalone
+    ];
+
+    // Shopping list
+    document.getElementById("shopping-list").innerHTML=
+      `<div class="print-page"><h2>Shopping List</h2>${generateShoppingList(allIngredients)}</div>`;
 
     // Recipes
     const recipesDiv=document.getElementById("recipes");
-    recipesDiv.innerHTML="<h2>Recipes</h2>";
+    recipesDiv.innerHTML="";
     selectedRecipes.forEach(r=>{
       const div=document.createElement("div");
-      div.className="recipe";
-      let html=`<h3>${r.name}</h3>`;
-      html+="<h4>Ingredients</h4><ul>";
+      div.className="recipe print-page";
+      let html=`<h2>${r.name}</h2><h3>Ingredients</h3><ul>`;
       r.ingredients.forEach(ing=>{
         html+=`<li>${toMixedFraction(ing.amount)} ${ing.unit} ${ing.name}</li>`;
       });
-      html+="</ul>";
-      html+="<h4>Instructions</h4>";
-      r.instructions.split("\n").forEach(step=>{
-        if(step.trim()==="") html+="<br>";
-        else html+=`<p>${step.trim()}</p>`;
+      html+="</ul><h3>Instructions</h3>";
+      r.instructions.split("\n").forEach(line=>{
+        if(line.trim()==="") html+="<br>";
+        else html+=`<p>${line}</p>`;
       });
       div.innerHTML=html;
       recipesDiv.appendChild(div);
     });
   });
-
-  // Print button
-  document.getElementById("print-btn").addEventListener("click",()=>window.print());
 });
+</script>
+</body>
+</html>
+
